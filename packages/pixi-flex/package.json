@@ -1,0 +1,22 @@
+{
+  "name": "@flora-studio/pixi-flex",
+  "version": "0.0.0",
+  "type": "module",
+  "files": ["dist"],
+  "main": "./dist/pixi-flex.umd.cjs",
+  "module": "./dist/pixi-flex.js",
+  "types": "./dist/pixi-flex.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/pixi-flex.js",
+      "require": "./dist/pixi-flex.umd.cjs"
+    }
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+  }
+}
