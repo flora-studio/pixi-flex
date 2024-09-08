@@ -17,6 +17,10 @@
     "build": "tsc && vite build",
     "preview": "vite preview"
   },
+  "dependencies": {
+    "pixi.js": "^8",
+    "yoga-layout": "^3.1.0"
+  },
   "devDependencies": {
   }
 }
