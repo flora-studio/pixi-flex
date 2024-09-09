@@ -14,6 +14,8 @@ export class FlexContainer extends Container {
   // we expect children are either all FlexContainer, or all not FlexContainer
   isFlexLeaf = true
 
+  // region parent-children relation
+
   private onAddedOrRemoved() {
     this.isFlexRoot = !(this.parent instanceof FlexContainer)
   }
@@ -23,7 +25,7 @@ export class FlexContainer extends Container {
   }
 
   private onChildAdded(child: Container, _: Container, index: number) {
-    checkMixedChildren(this.children, child)
+    checkMixedChildren(this.children, child, index)
     if (child instanceof FlexContainer) {
       this.node.insertChild(child.node, index)
     }
@@ -86,25 +88,30 @@ export class FlexContainer extends Container {
     super.destroy(options)
   }
 
-  // on every render, we measure the entire tree and do layout
-  private onRenderRoot() {
-    if (!this.isFlexRoot) return
+  // endregion
 
-    const measureStart = performance.now()
-    this.onMeasureLeaf()
-    console.log('measure cost:', performance.now() - measureStart)
+  // region cache the w/h on Yoga node
+  // if not set, the default Yoga node w/h is auto
+  // if set, we can skip leaf node's measure process
+  private _flexWidth: number | 'auto' | `${number}%` | undefined
+  private _flexHeight: number | 'auto' | `${number}%` | undefined
 
-    const layoutStart = performance.now()
-    this.node.calculateLayout(undefined, undefined)
-    console.log('layout cost:', performance.now() - layoutStart)
-
-    const applyStart = performance.now()
-    this.applyLayout()
-    console.log('apply cost:', performance.now() - applyStart)
+  get flexWidth() { return this._flexWidth }
+  set flexWidth(value: number | 'auto' | `${number}%` | undefined) {
+    this._flexWidth = value
+    this.node.setWidth(value)
   }
 
-  // skip measure for leaf node, so you can set a fixed size for yoga to layout
-  skipMeasure = false
+  get flexHeight() { return this._flexHeight }
+  set flexHeight(value: number | 'auto' | `${number}%` | undefined) {
+    this._flexHeight = value
+    this.node.setHeight(value)
+  }
+
+  private isSizeDetermined(value: number | 'auto' | `${number}%` | undefined) {
+    return typeof value !== 'undefined' && value !== 'auto'
+  }
+  // endregion
 
   private leafSize: Size = { width: 0, height: 0 }
 
@@ -116,7 +123,8 @@ export class FlexContainer extends Container {
       }
       return
     }
-    if (!this.skipMeasure) {
+    const skipMeasure = this.isSizeDetermined(this._flexWidth) && this.isSizeDetermined(this._flexHeight)
+    if (!skipMeasure) {
       this.getSize(this.leafSize)
       const { width, height } = this.leafSize
       this.node.setWidth(width)
@@ -148,15 +156,57 @@ export class FlexContainer extends Container {
     } else {
       // provide width & height info to children
       for (const child of this.children) {
-        child.emit('flex-after-layout', width, height)
+        child.emit('flex-after-layout', {
+          oldWidth: this.leafSize.width,
+          oldHeight: this.leafSize.height,
+          newWidth: width,
+          newHeight: height
+        })
       }
     }
   }
+
+  // on every render, we measure the entire tree and do layout
+  private onRenderRoot() {
+    if (!this.isFlexRoot) return
+
+    const measureStart = performance.now()
+    this.onMeasureLeaf()
+    console.log('measure cost:', performance.now() - measureStart)
+
+    const layoutStart = performance.now()
+    this.node.calculateLayout(undefined, undefined)
+    console.log('layout cost:', performance.now() - layoutStart)
+
+    const applyStart = performance.now()
+    this.applyLayout()
+    console.log('apply cost:', performance.now() - applyStart)
+  }
+
+  // should do layout on every onRender？
+  get doLayoutOnRender() {
+    return this.onRender === this.onRenderRoot
+  }
+
+  set doLayoutOnRender(value: boolean) {
+    // @ts-expect-error remove onRender callback
+    this.onRender = (value ? this.onRenderRoot : null)
+  }
+
+  // exposed to outside for manually calling layout
+  doLayout() {
+    if (!this.isFlexRoot) {
+      (this.parent as FlexContainer).doLayout()
+      return
+    }
+    this.onRenderRoot()
+  }
 }
 
-function checkMixedChildren(children: Container[], newChild: Container) {
-  if (children.length === 0) return
-  const isAllFlexChildren = children[0] instanceof FlexContainer
+function checkMixedChildren(children: Container[], newChild: Container, newChildIndex: number) {
+  if (children.length <= 1) return // newChild is the only child
+  const whateverAnotherChild = children[newChildIndex === 0 ? 1 : 0]
+  const isAllFlexChildren = whateverAnotherChild instanceof FlexContainer
   const isNewFlexChildren = newChild instanceof FlexContainer
   if (isAllFlexChildren !== isNewFlexChildren) {
     console.warn('mixed children type is not recommended')
