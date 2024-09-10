@@ -1,9 +1,9 @@
 import { Container, ContainerOptions, DestroyOptions, Size } from 'pixi.js'
-import Yoga from 'yoga-layout'
+import { Yoga } from './init.ts'
 
 export class FlexContainer extends Container {
 
-  readonly node = Yoga.Node.create()
+  readonly node = Yoga!.Node.create()
 
   // is the root of yoga tree?
   // means its parent is not FlexContainer

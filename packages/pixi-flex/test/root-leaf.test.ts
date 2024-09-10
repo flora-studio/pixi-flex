@@ -1,8 +1,12 @@
-import { describe, expect, test } from 'vitest'
-import { FlexContainer } from '../src/FlexContainer'
+import { beforeAll, describe, expect, test } from 'vitest'
+import { FlexContainer, initPixiFlexLayout } from '../src'
 import { Container } from 'pixi.js'
 
 describe('root-leaf test', () => {
+  beforeAll(async () => {
+    await initPixiFlexLayout()
+  })
+
   test('check is flex root', () => {
     const flexContainer = new FlexContainer()
     expect(flexContainer.isFlexRoot).toBe(true)

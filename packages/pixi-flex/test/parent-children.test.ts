@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest'
-import { FlexContainer } from '../src/FlexContainer'
+import { FlexContainer } from '../src'
 import Yoga from 'yoga-layout'
 
 describe('map pixi container to yoga node', () => {
