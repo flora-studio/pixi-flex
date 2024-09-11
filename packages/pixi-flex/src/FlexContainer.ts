@@ -170,17 +170,17 @@ export class FlexContainer extends Container {
   private onRenderRoot() {
     if (!this.isFlexRoot) return
 
-    const measureStart = performance.now()
+    // const measureStart = performance.now()
     this.onMeasureLeaf()
-    console.log('measure cost:', performance.now() - measureStart)
+    // console.log('measure cost:', performance.now() - measureStart)
 
-    const layoutStart = performance.now()
+    // const layoutStart = performance.now()
     this.node.calculateLayout(undefined, undefined)
-    console.log('layout cost:', performance.now() - layoutStart)
+    // console.log('layout cost:', performance.now() - layoutStart)
 
-    const applyStart = performance.now()
+    // const applyStart = performance.now()
     this.applyLayout()
-    console.log('apply cost:', performance.now() - applyStart)
+    // console.log('apply cost:', performance.now() - applyStart)
   }
 
   // should do layout on every onRender？
