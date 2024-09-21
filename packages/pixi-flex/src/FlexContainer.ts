@@ -7,6 +7,8 @@ export class FlexContainer extends Container {
 
   protected readonly node = Yoga!.Node.create()
 
+  flexTag = ''
+
   // is the root of yoga tree?
   // means its parent is not FlexContainer
   isFlexRoot = true
@@ -136,7 +138,7 @@ export class FlexContainer extends Container {
 
   // apply calculated result from root to children
   // see https://www.yogalayout.dev/docs/advanced/incremental-layout
-  protected applyLayout(parentX = 0, parentY = 0) {
+  protected applyLayout() {
     const node = this.node
     if (!node.hasNewLayout()) {
       return
@@ -146,23 +148,25 @@ export class FlexContainer extends Container {
     node.markLayoutSeen()
 
     // apply layout result to pixi
-    const { left, top, width, height } = node.getComputedLayout()
-    this.x = left - parentX
-    this.y = top - parentY
+    const { left, top, right, bottom, width, height } = node.getComputedLayout()
+    // console.log(this.flexTag, `测量结果, left = ${left}, top = ${top}, width = ${width}, height = ${height}`)
+    this.x = left // - parentX
+    this.y = top // - parentY
 
     // layout children
     if (!this.isFlexLeaf) {
       for (const child of this.children) {
-        (child as FlexContainer).applyLayout?.(left, top)
+        (child as FlexContainer).applyLayout?.()
       }
     } else {
       // provide width & height info to children
       // for (const child of this.children) {
+      console.log(this.flexTag, `测量结果, left = ${left}, top = ${top}, right = ${right}, bottom = ${bottom}, width = ${width}, height = ${height}`)
         this.emit('flex-after-layout', {
           oldWidth: this.leafSize.width,
           oldHeight: this.leafSize.height,
-          newWidth: width,
-          newHeight: height
+          width,
+          height
         })
       // }
     }

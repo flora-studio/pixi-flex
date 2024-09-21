@@ -1,10 +1,12 @@
 import BasicExample from './views/basic.tsx'
+import NestedExample from './views/nested.tsx'
 
 function App() {
 
   return (
     <div>
-      <BasicExample />
+      {/*<BasicExample />*/}
+      <NestedExample />
     </div>
   )
 }

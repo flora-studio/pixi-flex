@@ -11,8 +11,8 @@ async function init() {
 
   const root = new FlexContainer()
   root.flexWidth = 640
-  root.node.setFlexDirection(FlexDirection.Row)
-  root.node.setJustifyContent(Justify.SpaceBetween)
+  root.flexDirection = FlexDirection.Row
+  root.justifyContent = Justify.SpaceBetween
 
   for (let i = 0; i < 3; i++) {
     const sprite = createSpriteContainer()
@@ -51,7 +51,10 @@ function BasicExample() {
   const onOptionChange = (e: ChangeEvent<HTMLInputElement>): void => {
     const value = Number(e.target.value) as Justify
     setJustifyContent(value)
-    rootNodeRef.current?.node.setJustifyContent(value)
+    const root = rootNodeRef.current
+    if (root) {
+      root.justifyContent = value
+    }
   }
 
   return (
