@@ -7,8 +7,6 @@ export class FlexContainer extends Container {
 
   protected readonly node = Yoga!.Node.create()
 
-  flexTag = ''
-
   // is the root of yoga tree?
   // means its parent is not FlexContainer
   isFlexRoot = true
@@ -149,7 +147,6 @@ export class FlexContainer extends Container {
 
     // apply layout result to pixi
     const { left, top, right, bottom, width, height } = node.getComputedLayout()
-    // console.log(this.flexTag, `测量结果, left = ${left}, top = ${top}, width = ${width}, height = ${height}`)
     this.x = left // - parentX
     this.y = top // - parentY
 
@@ -160,15 +157,13 @@ export class FlexContainer extends Container {
       }
     } else {
       // provide width & height info to children
-      // for (const child of this.children) {
-      console.log(this.flexTag, `测量结果, left = ${left}, top = ${top}, right = ${right}, bottom = ${bottom}, width = ${width}, height = ${height}`)
-        this.emit('flex-after-layout', {
-          oldWidth: this.leafSize.width,
-          oldHeight: this.leafSize.height,
-          width,
-          height
-        })
-      // }
+      console.log(this.label, `测量结果, left = ${left}, top = ${top}, right = ${right}, bottom = ${bottom}, width = ${width}, height = ${height}`)
+      this.emit('flex-after-layout', {
+        oldWidth: this.leafSize.width,
+        oldHeight: this.leafSize.height,
+        width,
+        height
+      })
     }
   }
 

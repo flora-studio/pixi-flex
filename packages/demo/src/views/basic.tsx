@@ -1,12 +1,10 @@
 import { Application, Assets, Sprite } from 'pixi.js'
-import { ChangeEvent, useEffect, useRef, useState } from 'react'
+import { ChangeEvent, useRef, useState } from 'react'
 import bunny from '../assets/bunny.png'
 import { FlexContainer, FlexDirection, Justify } from '@flora-studio/pixi-flex'
+import PixiRoot from './PixiRoot.tsx'
 
-async function init() {
-  const app = new Application()
-  await app.init({ width: 640, height: 360 })
-  document.getElementById('example-basic')!.appendChild(app.canvas)
+async function init(app: Application) {
   await Assets.load(bunny)
 
   const root = new FlexContainer()
@@ -40,12 +38,6 @@ const options = [
 
 function BasicExample() {
   const rootNodeRef = useRef<FlexContainer | null>(null)
-  useEffect(() => {
-    init().then(root => rootNodeRef.current = root)
-    return () => {
-      document.getElementById('example-basic')!.innerHTML = ''
-    }
-  }, [])
 
   const [justifyContent, setJustifyContent] = useState<Justify>(Justify.SpaceBetween)
   const onOptionChange = (e: ChangeEvent<HTMLInputElement>): void => {
@@ -74,7 +66,7 @@ function BasicExample() {
           </div>
         ))}
       </div>
-      <div id="example-basic"></div>
+      <PixiRoot ref={rootNodeRef} init={init} />
     </div>
   )
 }
