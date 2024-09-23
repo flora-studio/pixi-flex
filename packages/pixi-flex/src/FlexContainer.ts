@@ -109,10 +109,6 @@ export class FlexContainer extends Container {
     this._flexHeight = value
     this.node.setHeight(value)
   }
-
-  private isSizeDetermined(value: FormattedValue) {
-    return typeof value !== 'undefined' && value !== 'auto'
-  }
   // endregion
 
   private leafSize: Size = { width: 0, height: 0 }
@@ -125,12 +121,15 @@ export class FlexContainer extends Container {
       }
       return
     }
-    const skipMeasure = this.isSizeDetermined(this._flexWidth) && this.isSizeDetermined(this._flexHeight)
+
+    const widthDetermined = isSizeDetermined(this._flexWidth)
+    const heightDetermined = isSizeDetermined(this._flexHeight)
+    const skipMeasure = widthDetermined && heightDetermined
     if (!skipMeasure) {
       this.getSize(this.leafSize)
       const { width, height } = this.leafSize
-      this.node.setWidth(width)
-      this.node.setHeight(height)
+      if (!widthDetermined) this.node.setWidth(width)
+      if (!heightDetermined) this.node.setHeight(height)
     }
   }
 
@@ -147,8 +146,10 @@ export class FlexContainer extends Container {
 
     // apply layout result to pixi
     const { left, top, right, bottom, width, height } = node.getComputedLayout()
-    this.x = left // - parentX
-    this.y = top // - parentY
+    // console.log(this.label, `测量结果, left = ${left}, top = ${top}, right = ${right}, bottom = ${bottom}, width = ${width}, height = ${height}, cWidth = ${node.getComputedWidth()}`)
+
+    this.x = left
+    this.y = top
 
     // layout children
     if (!this.isFlexLeaf) {
@@ -159,8 +160,9 @@ export class FlexContainer extends Container {
       // provide width & height info to children
       console.log(this.label, `测量结果, left = ${left}, top = ${top}, right = ${right}, bottom = ${bottom}, width = ${width}, height = ${height}`)
       this.emit('flex-after-layout', {
-        oldWidth: this.leafSize.width,
-        oldHeight: this.leafSize.height,
+        // if skip measure, oldWidth & oldHeight is empty
+        // oldWidth: this.leafSize.width,
+        // oldHeight: this.leafSize.height,
         width,
         height
       })
@@ -654,6 +656,10 @@ export class FlexContainer extends Container {
     this.node.setPositionType(value)
   }
   // endregion
+}
+
+function isSizeDetermined(value: FormattedValue) {
+  return typeof value !== 'undefined' && value !== 'auto'
 }
 
 function checkMixedChildren(children: Container[], newChild: Container, newChildIndex: number) {

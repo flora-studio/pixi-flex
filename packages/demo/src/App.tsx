@@ -1,6 +1,8 @@
+import { useState } from 'react'
 import BasicExample from './views/basic.tsx'
 import NestedExample from './views/nested.tsx'
-import { useState } from 'react'
+import AnchorExample from './views/anchor.tsx'
+import TextExample from './views/text.tsx'
 
 const demos = [
   {
@@ -10,6 +12,14 @@ const demos = [
   {
     name: 'Nested Example',
     renderer: () => <NestedExample />,
+  },
+  {
+    name: 'Deal with anchor',
+    renderer: () => <AnchorExample />,
+  },
+  {
+    name: 'Respond to size change',
+    renderer: () => <TextExample />
   }
 ]
 

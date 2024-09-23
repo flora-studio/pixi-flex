@@ -1,13 +1,12 @@
-import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef } from 'react'
-import { FlexContainer } from '@flora-studio/pixi-flex'
-import { Application } from 'pixi.js'
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useState } from 'react'
+import { Application, Container } from 'pixi.js'
 
 interface Props {
-  init: (app: Application) => Promise<FlexContainer>
+  init: (app: Application) => Promise<Container>
 }
 
-const PixiRoot = forwardRef<FlexContainer, Props>(function PixiRoot({ init }: Props, ref) {
-  const rootNodeRef = useRef<FlexContainer | null>(null)
+const PixiRoot = forwardRef<Container, Props>(function PixiRoot({ init }: Props, ref) {
+  const [rootNode, setRootNode] = useState<Container | null>(null)
 
   const initCallback = useCallback(async () => {
     const app = new Application()
@@ -19,13 +18,13 @@ const PixiRoot = forwardRef<FlexContainer, Props>(function PixiRoot({ init }: Pr
   }, [init])
 
   useEffect(() => {
-    initCallback().then(root => rootNodeRef.current = root)
+    initCallback().then(root => setRootNode(root))
     return () => {
       document.getElementById('pixi-root')!.innerHTML = ''
     }
   }, [initCallback])
 
-  useImperativeHandle(ref, () => rootNodeRef.current!)
+  useImperativeHandle(ref, () => rootNode!, [rootNode])
 
   return <div id="pixi-root"></div>
 })
