@@ -1,6 +1,17 @@
 import { Container, ContainerOptions, DestroyOptions, Size } from 'pixi.js'
 import { Yoga, YogaConfig } from './init.ts'
-import { Align, Edge, Direction, FlexDirection, Wrap, Justify, Gutter, Overflow, PositionType } from 'yoga-layout/load'
+import {
+  Align,
+  Edge,
+  Direction,
+  FlexDirection,
+  Wrap,
+  Justify,
+  Gutter,
+  Overflow,
+  PositionType,
+  Display
+} from 'yoga-layout/load'
 import { FormattedValue, formatValue } from './utils.ts'
 
 export class FlexContainer extends Container {
@@ -204,6 +215,17 @@ export class FlexContainer extends Container {
     }
     this.onRenderRoot()
   }
+
+  // region handle visible <-> flex display
+  override get visible() {
+    return super.visible
+  }
+
+  override set visible(value: boolean) {
+    super.visible = value
+    this.node.setDisplay(value ? Display.Flex : Display.None)
+  }
+  // endregion
 
   // region add flex props
   get alignContent() {

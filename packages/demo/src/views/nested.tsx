@@ -48,13 +48,6 @@ async function init(app: Application) {
   const icon = new FlexContainer()
   icon.label = 'icon'
   const sprite = Sprite.from(bunny)
-  sprite.anchor = 0.5
-  icon.on('flex-after-layout', ({ width, height }) => {
-    console.log('flex-after-layout', width, height)
-    sprite.x = width / 2
-    sprite.y = height / 2
-    // sprite.rotation = -Math.PI / 2
-  })
   icon.addChild(sprite)
   dialog.addChild(icon)
 
