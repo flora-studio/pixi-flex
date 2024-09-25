@@ -3,6 +3,7 @@ import BasicExample from './views/basic.tsx'
 import NestedExample from './views/nested.tsx'
 import AnchorExample from './views/anchor.tsx'
 import TextExample from './views/text.tsx'
+import VisibleExample from './views/visible.tsx'
 
 const demos = [
   {
@@ -20,6 +21,10 @@ const demos = [
   {
     name: 'Respond to size change',
     renderer: () => <TextExample />
+  },
+  {
+    name: 'Renderable vs Visible',
+    renderer: () => <VisibleExample />,
   }
 ]
 
