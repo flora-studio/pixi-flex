@@ -1,5 +1,5 @@
 import { Application, Text, TextStyle } from 'pixi.js'
-import { FLEX_AFTER_LAYOUT, FlexContainer } from '@flora-studio/pixi-flex'
+import { FLEX_AFTER_LAYOUT, FlexContainer } from '@florastudio/pixi-flex'
 import PixiRoot from './PixiRoot.tsx'
 import { ChangeEvent, useRef, useState } from 'react'
 
@@ -16,7 +16,7 @@ async function init(app: Application) {
 
   const text2 = createTextNode()
   text2.flexWidth = '100%'
-  text2.on(FLEX_AFTER_LAYOUT, ({ width }) => {
+  text2.on(FLEX_AFTER_LAYOUT, ({ width }: { width: number }) => {
     const pixiText = text2.getChildAt(0) as Text
     pixiText.width = width
   })
@@ -24,7 +24,7 @@ async function init(app: Application) {
 
   const text3 = createTextNode()
   text3.flexWidth = '100%'
-  text3.on(FLEX_AFTER_LAYOUT, ({ width }) => {
+  text3.on(FLEX_AFTER_LAYOUT, ({ width }: { width: number }) => {
     const pixiText = text3.getChildAt(0) as Text
     pixiText.style.wordWrap = true
     pixiText.style.wordWrapWidth = width

@@ -1,6 +1,6 @@
 import { Application, Assets, Sprite } from 'pixi.js'
 import bunny from '../assets/bunny.png'
-import { Align, FlexContainer, FlexDirection, Justify, FLEX_AFTER_LAYOUT } from '@flora-studio/pixi-flex'
+import { Align, FlexContainer, FlexDirection, Justify, FLEX_AFTER_LAYOUT } from '@florastudio/pixi-flex'
 import PixiRoot from './PixiRoot.tsx'
 
 async function init(app: Application) {

@@ -8,6 +8,9 @@
     "packages/pixi-flex",
     "packages/demo"
   ],
+  "scripts": {
+    "build:demo": "yarn workspace demo run build"
+  },
   "devDependencies": {
     "@eslint/js": "^9.9.0",
     "@types/node": "^22.5.4",

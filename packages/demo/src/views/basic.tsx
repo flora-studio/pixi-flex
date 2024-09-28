@@ -1,7 +1,7 @@
 import { Application, Assets, Sprite } from 'pixi.js'
 import { ChangeEvent, useRef, useState } from 'react'
 import bunny from '../assets/bunny.png'
-import { FlexContainer, FlexDirection, Justify } from '@flora-studio/pixi-flex'
+import { FlexContainer, FlexDirection, Justify } from '@florastudio/pixi-flex'
 import PixiRoot from './PixiRoot.tsx'
 
 async function init(app: Application) {

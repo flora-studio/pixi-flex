@@ -1,5 +1,5 @@
 import { Application, Text, TextStyle } from 'pixi.js'
-import { FlexContainer } from '@flora-studio/pixi-flex'
+import { FlexContainer } from '@florastudio/pixi-flex'
 import { ChangeEvent, useRef, useState } from 'react'
 import PixiRoot from './PixiRoot.tsx'
 
