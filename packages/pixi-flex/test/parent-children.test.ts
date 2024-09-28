@@ -1,8 +1,12 @@
-import { describe, expect, test } from 'vitest'
-import { FlexContainer } from '../src'
-import Yoga from 'yoga-layout'
+import { beforeAll, describe, expect, test } from 'vitest'
+import { FlexContainer, initPixiFlexLayout } from '../src'
+import { Yoga } from '../src/init'
 
 describe('map pixi container to yoga node', () => {
+  beforeAll(async () => {
+    await initPixiFlexLayout()
+  })
+
   test('yoga node equality', () => {
     const parent = Yoga.Node.create()
     const child = Yoga.Node.create()

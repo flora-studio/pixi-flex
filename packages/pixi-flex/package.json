@@ -1,6 +1,6 @@
 {
-  "name": "@flora-studio/pixi-flex",
-  "version": "0.0.0",
+  "name": "@florastudio/pixi-flex",
+  "version": "0.0.1",
   "type": "module",
   "files": ["dist"],
   "main": "./dist/pixi-flex.umd.cjs",

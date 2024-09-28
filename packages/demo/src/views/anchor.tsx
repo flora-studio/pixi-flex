@@ -1,6 +1,6 @@
 import { Application, Assets, Sprite } from 'pixi.js'
 import bunny from '../assets/bunny.png'
-import { Align, FlexContainer, FlexDirection, Justify } from '@flora-studio/pixi-flex'
+import { Align, FlexContainer, FlexDirection, Justify, FLEX_AFTER_LAYOUT } from '@flora-studio/pixi-flex'
 import PixiRoot from './PixiRoot.tsx'
 
 async function init(app: Application) {
@@ -31,7 +31,7 @@ async function init(app: Application) {
   const icon3 = new FlexContainer()
   const sprite3 = Sprite.from(bunny)
   sprite3.anchor = 0.5
-  icon3.on('flex-after-layout', ({ width, height }) => {
+  icon3.on(FLEX_AFTER_LAYOUT, ({ width, height }) => {
     sprite3.x = width / 2
     sprite3.y = height / 2
   })

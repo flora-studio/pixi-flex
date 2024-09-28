@@ -12,7 +12,7 @@ import {
   PositionType,
   Display
 } from 'yoga-layout/load'
-import { FormattedValue, formatValue } from './utils.ts'
+import { FLEX_AFTER_LAYOUT, FormattedValue, FormattedValueWithAuto, formatValue } from './utils.ts'
 
 export class FlexContainer extends Container {
 
@@ -106,17 +106,17 @@ export class FlexContainer extends Container {
   // region cache the w/h on Yoga node
   // if not set, the default Yoga node w/h is auto
   // if set, we can skip leaf node's measure process
-  private _flexWidth: FormattedValue
-  private _flexHeight: FormattedValue
+  private _flexWidth: FormattedValueWithAuto
+  private _flexHeight: FormattedValueWithAuto
 
   get flexWidth() { return this._flexWidth }
-  set flexWidth(value: FormattedValue) {
+  set flexWidth(value: FormattedValueWithAuto) {
     this._flexWidth = value
     this.node.setWidth(value)
   }
 
   get flexHeight() { return this._flexHeight }
-  set flexHeight(value: FormattedValue) {
+  set flexHeight(value: FormattedValueWithAuto) {
     this._flexHeight = value
     this.node.setHeight(value)
   }
@@ -156,8 +156,7 @@ export class FlexContainer extends Container {
     node.markLayoutSeen()
 
     // apply layout result to pixi
-    const { left, top, right, bottom, width, height } = node.getComputedLayout()
-    // console.log(this.label, `测量结果, left = ${left}, top = ${top}, right = ${right}, bottom = ${bottom}, width = ${width}, height = ${height}, cWidth = ${node.getComputedWidth()}`)
+    const { left, top, width, height } = node.getComputedLayout()
 
     this.x = left
     this.y = top
@@ -169,8 +168,8 @@ export class FlexContainer extends Container {
       }
     } else {
       // provide width & height info to children
-      console.log(this.label, `测量结果, left = ${left}, top = ${top}, right = ${right}, bottom = ${bottom}, width = ${width}, height = ${height}`)
-      this.emit('flex-after-layout', {
+      // console.log(this.label, `测量结果, left = ${left}, top = ${top}, right = ${right}, bottom = ${bottom}, width = ${width}, height = ${height}`)
+      this.emit(FLEX_AFTER_LAYOUT, {
         // if skip measure, oldWidth & oldHeight is empty
         // oldWidth: this.leafSize.width,
         // oldHeight: this.leafSize.height,
@@ -348,7 +347,7 @@ export class FlexContainer extends Container {
     return formatValue(this.node.getFlexBasis())
   }
 
-  set flexBasis(flexBasis: FormattedValue) {
+  set flexBasis(flexBasis: FormattedValueWithAuto) {
     this.node.setFlexBasis(flexBasis)
   }
 
@@ -393,29 +392,26 @@ export class FlexContainer extends Container {
   }
 
   get gap() {
-    // @ts-expect-error no 'auto'
-    return formatValue(this.node.getGap(Gutter.All))
+    return formatValue(this.node.getGap(Gutter.All)) as FormattedValue
   }
 
-  set gap(value: number | `${number}%` | undefined) {
+  set gap(value: FormattedValue) {
     this.node.setGap(Gutter.All, value)
   }
 
   get rowGap() {
-    // @ts-expect-error no 'auto'
-    return formatValue(this.node.getGap(Gutter.Row))
+    return formatValue(this.node.getGap(Gutter.Row)) as FormattedValue
   }
 
-  set rowGap(value: number | `${number}%` | undefined) {
+  set rowGap(value: FormattedValue) {
     this.node.setGap(Gutter.Row, value)
   }
 
   get columnGap() {
-    // @ts-expect-error no 'auto'
-    return formatValue(this.node.getGap(Gutter.Column))
+    return formatValue(this.node.getGap(Gutter.Column)) as FormattedValue
   }
 
-  set columnGap(value: number | `${number}%` | undefined) {
+  set columnGap(value: FormattedValue) {
     this.node.setGap(Gutter.Column, value)
   }
 
@@ -423,7 +419,7 @@ export class FlexContainer extends Container {
     return formatValue(this.node.getMargin(Edge.Top))
   }
 
-  set marginTop(value: FormattedValue) {
+  set marginTop(value: FormattedValueWithAuto) {
     this.node.setMargin(Edge.Top, value)
   }
 
@@ -431,7 +427,7 @@ export class FlexContainer extends Container {
     return formatValue(this.node.getMargin(Edge.Right))
   }
 
-  set marginRight(value: FormattedValue) {
+  set marginRight(value: FormattedValueWithAuto) {
     this.node.setMargin(Edge.Right, value)
   }
 
@@ -439,7 +435,7 @@ export class FlexContainer extends Container {
     return formatValue(this.node.getMargin(Edge.Bottom))
   }
 
-  set marginBottom(value: FormattedValue) {
+  set marginBottom(value: FormattedValueWithAuto) {
     this.node.setMargin(Edge.Bottom, value)
   }
 
@@ -447,7 +443,7 @@ export class FlexContainer extends Container {
     return formatValue(this.node.getMargin(Edge.Left))
   }
 
-  set marginLeft(value: FormattedValue) {
+  set marginLeft(value: FormattedValueWithAuto) {
     this.node.setMargin(Edge.Left, value)
   }
 
@@ -455,7 +451,7 @@ export class FlexContainer extends Container {
     return formatValue(this.node.getMargin(Edge.Start))
   }
 
-  set marginStart(value: FormattedValue) {
+  set marginStart(value: FormattedValueWithAuto) {
     this.node.setMargin(Edge.Start, value)
   }
 
@@ -463,7 +459,7 @@ export class FlexContainer extends Container {
     return formatValue(this.node.getMargin(Edge.End))
   }
 
-  set marginEnd(value: FormattedValue) {
+  set marginEnd(value: FormattedValueWithAuto) {
     this.node.setMargin(Edge.End, value)
   }
 
@@ -471,7 +467,7 @@ export class FlexContainer extends Container {
     return formatValue(this.node.getMargin(Edge.Horizontal))
   }
 
-  set marginHorizontal(value: FormattedValue) {
+  set marginHorizontal(value: FormattedValueWithAuto) {
     this.node.setMargin(Edge.Horizontal, value)
   }
 
@@ -479,7 +475,7 @@ export class FlexContainer extends Container {
     return formatValue(this.node.getMargin(Edge.Vertical))
   }
 
-  set marginVertical(value: FormattedValue) {
+  set marginVertical(value: FormattedValueWithAuto) {
     this.node.setMargin(Edge.Vertical, value)
   }
 
@@ -487,43 +483,39 @@ export class FlexContainer extends Container {
     return formatValue(this.node.getMargin(Edge.All))
   }
 
-  set margin(value: FormattedValue) {
+  set margin(value: FormattedValueWithAuto) {
     this.node.setMargin(Edge.All, value)
   }
 
   get maxHeight() {
-    // @ts-expect-error no 'auto'
-    return formatValue(this.node.getMaxHeight())
+    return formatValue(this.node.getMaxHeight()) as FormattedValue
   }
 
-  set maxHeight(value: number | `${number}%` | undefined) {
+  set maxHeight(value: FormattedValue) {
     this.node.setMaxHeight(value)
   }
 
   get maxWidth() {
-    // @ts-expect-error no 'auto'
-    return formatValue(this.node.getMaxWidth())
+    return formatValue(this.node.getMaxWidth()) as FormattedValue
   }
 
-  set maxWidth(value: number | `${number}%` | undefined) {
+  set maxWidth(value: FormattedValue) {
     this.node.setMaxWidth(value)
   }
 
   get minHeight() {
-    // @ts-expect-error no 'auto'
-    return formatValue(this.node.getMinHeight())
+    return formatValue(this.node.getMinHeight()) as FormattedValue
   }
 
-  set minHeight(value: number | `${number}%` | undefined) {
+  set minHeight(value: FormattedValue) {
     this.node.setMinHeight(value)
   }
 
   get minWidth() {
-    // @ts-expect-error no 'auto'
-    return formatValue(this.node.getMinWidth())
+    return formatValue(this.node.getMinWidth()) as FormattedValue
   }
 
-  set minWidth(value: number | `${number}%` | undefined) {
+  set minWidth(value: FormattedValue) {
     this.node.setMinWidth(value)
   }
 
@@ -536,137 +528,122 @@ export class FlexContainer extends Container {
   }
 
   get paddingTop() {
-    // @ts-expect-error no 'auto'
-    return formatValue(this.node.getPadding(Edge.Top))
+    return formatValue(this.node.getPadding(Edge.Top)) as FormattedValue
   }
 
-  set paddingTop(value: number | `${number}%` | undefined) {
+  set paddingTop(value: FormattedValue) {
     this.node.setPadding(Edge.Top, value)
   }
 
   get paddingRight() {
-    // @ts-expect-error no 'auto'
-    return formatValue(this.node.getPadding(Edge.Right))
+    return formatValue(this.node.getPadding(Edge.Right)) as FormattedValue
   }
 
-  set paddingRight(value: number | `${number}%` | undefined) {
+  set paddingRight(value: FormattedValue) {
     this.node.setPadding(Edge.Right, value)
   }
 
   get paddingBottom() {
-    // @ts-expect-error no 'auto'
-    return formatValue(this.node.getPadding(Edge.Bottom))
+    return formatValue(this.node.getPadding(Edge.Bottom)) as FormattedValue
   }
 
-  set paddingBottom(value: number | `${number}%` | undefined) {
+  set paddingBottom(value: FormattedValue) {
     this.node.setPadding(Edge.Bottom, value)
   }
 
   get paddingLeft() {
-    // @ts-expect-error no 'auto'
-    return formatValue(this.node.getPadding(Edge.Left))
+    return formatValue(this.node.getPadding(Edge.Left)) as FormattedValue
   }
 
-  set paddingLeft(value: number | `${number}%` | undefined) {
+  set paddingLeft(value: FormattedValue) {
     this.node.setPadding(Edge.Left, value)
   }
 
   get paddingStart() {
-    // @ts-expect-error no 'auto'
-    return formatValue(this.node.getPadding(Edge.Start))
+    return formatValue(this.node.getPadding(Edge.Start)) as FormattedValue
   }
 
-  set paddingStart(value: number | `${number}%` | undefined) {
+  set paddingStart(value: FormattedValue) {
     this.node.setPadding(Edge.Start, value)
   }
 
   get paddingEnd() {
-    // @ts-expect-error no 'auto'
-    return formatValue(this.node.getPadding(Edge.End))
+    return formatValue(this.node.getPadding(Edge.End)) as FormattedValue
   }
 
-  set paddingEnd(value: number | `${number}%` | undefined) {
+  set paddingEnd(value: FormattedValue) {
     this.node.setPadding(Edge.End, value)
   }
 
   get paddingHorizontal() {
-    // @ts-expect-error no 'auto'
-    return formatValue(this.node.getPadding(Edge.Horizontal))
+    return formatValue(this.node.getPadding(Edge.Horizontal)) as FormattedValue
   }
 
-  set paddingHorizontal(value: number | `${number}%` | undefined) {
+  set paddingHorizontal(value: FormattedValue) {
     this.node.setPadding(Edge.Horizontal, value)
   }
 
   get paddingVertical() {
-    // @ts-expect-error no 'auto'
-    return formatValue(this.node.getPadding(Edge.Vertical))
+    return formatValue(this.node.getPadding(Edge.Vertical)) as FormattedValue
   }
 
-  set paddingVertical(value: number | `${number}%` | undefined) {
+  set paddingVertical(value: FormattedValue) {
     this.node.setPadding(Edge.Vertical, value)
   }
 
   get padding() {
-    // @ts-expect-error no 'auto'
-    return formatValue(this.node.getPadding(Edge.All))
+    return formatValue(this.node.getPadding(Edge.All)) as FormattedValue
   }
 
-  set padding(value: number | `${number}%` | undefined) {
+  set padding(value: FormattedValue) {
     this.node.setPadding(Edge.All, value)
   }
 
   get top() {
-    // @ts-expect-error no 'auto'
-    return formatValue(this.node.getPosition(Edge.Top))
+    return formatValue(this.node.getPosition(Edge.Top)) as FormattedValue
   }
 
-  set top(value: number | `${number}%` | undefined) {
+  set top(value: FormattedValue) {
     this.node.setPosition(Edge.Top, value)
   }
 
   get right() {
-    // @ts-expect-error no 'auto'
-    return formatValue(this.node.getPosition(Edge.Right))
+    return formatValue(this.node.getPosition(Edge.Right)) as FormattedValue
   }
 
-  set right(value: number | `${number}%` | undefined) {
+  set right(value: FormattedValue) {
     this.node.setPosition(Edge.Right, value)
   }
 
   get bottom() {
-    // @ts-expect-error no 'auto'
-    return formatValue(this.node.getPosition(Edge.Bottom))
+    return formatValue(this.node.getPosition(Edge.Bottom)) as FormattedValue
   }
 
-  set bottom(value: number | `${number}%` | undefined) {
+  set bottom(value: FormattedValue) {
     this.node.setPosition(Edge.Bottom, value)
   }
 
   get left() {
-    // @ts-expect-error no 'auto'
-    return formatValue(this.node.getPosition(Edge.Left))
+    return formatValue(this.node.getPosition(Edge.Left)) as FormattedValue
   }
 
-  set left(value: number | `${number}%` | undefined) {
+  set left(value: FormattedValue) {
     this.node.setPosition(Edge.Left, value)
   }
 
   get start() {
-    // @ts-expect-error no 'auto'
-    return formatValue(this.node.getPosition(Edge.Start))
+    return formatValue(this.node.getPosition(Edge.Start)) as FormattedValue
   }
 
-  set start(value: number | `${number}%` | undefined) {
+  set start(value: FormattedValue) {
     this.node.setPosition(Edge.Start, value)
   }
 
   get end() {
-    // @ts-expect-error no 'auto'
-    return formatValue(this.node.getPosition(Edge.End))
+    return formatValue(this.node.getPosition(Edge.End)) as FormattedValue
   }
 
-  set end(value: number | `${number}%` | undefined) {
+  set end(value: FormattedValue) {
     this.node.setPosition(Edge.End, value)
   }
 
@@ -680,7 +657,7 @@ export class FlexContainer extends Container {
   // endregion
 }
 
-function isSizeDetermined(value: FormattedValue) {
+function isSizeDetermined(value: FormattedValueWithAuto) {
   return typeof value !== 'undefined' && value !== 'auto'
 }
 

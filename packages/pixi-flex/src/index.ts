@@ -1,4 +1,4 @@
-import {
+export {
   Align,
   Dimension,
   Direction,
@@ -13,22 +13,8 @@ import {
   Wrap
 } from 'yoga-layout/load'
 
-export {
-  Align,
-  Dimension,
-  Direction,
-  Display,
-  Edge,
-  FlexDirection,
-  Gutter,
-  Justify,
-  Overflow,
-  PositionType,
-  Unit,
-  Wrap
-}
+export { initPixiFlexLayout } from './init.ts'
 
-import { initPixiFlexLayout } from './init.ts'
-export { initPixiFlexLayout }
+export { FLEX_AFTER_LAYOUT } from './utils.ts'
 
 export * from './FlexContainer'

@@ -1,6 +1,6 @@
 import { Application, Assets, Sprite, Texture, Text, TextStyle } from 'pixi.js'
 import bunny from '../assets/bunny.png'
-import { Align, FlexContainer, FlexDirection, Justify, PositionType } from '@flora-studio/pixi-flex'
+import { Align, FLEX_AFTER_LAYOUT, FlexContainer, FlexDirection, Justify, PositionType } from '@flora-studio/pixi-flex'
 import PixiRoot from './PixiRoot.tsx'
 
 async function init(app: Application) {
@@ -32,7 +32,7 @@ async function init(app: Application) {
   dialogBackground.flexWidth = '100%'
   dialogBackground.flexHeight = '100%'
   const backgroundSprite = new Sprite(Texture.WHITE)
-  dialogBackground.on('flex-after-layout', ({ width, height }) => {
+  dialogBackground.on(FLEX_AFTER_LAYOUT, ({ width, height }) => {
     backgroundSprite.width = width
     backgroundSprite.height = height
   })
