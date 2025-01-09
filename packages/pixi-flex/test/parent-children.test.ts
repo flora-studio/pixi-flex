@@ -32,4 +32,11 @@ describe('map pixi container to yoga node', () => {
     parent.destroy()
     child.destroy()
   })
+
+  test('add children from constructor', () => {
+    const child = new FlexContainer()
+    const parent = new FlexContainer({ children: [child] })
+    expect(parent.node.getChildCount()).toBe(1)
+    expect(child.node.getParent()).toBeTruthy()
+  })
 })

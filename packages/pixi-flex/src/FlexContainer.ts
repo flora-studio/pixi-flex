@@ -1,4 +1,4 @@
-import { Container, ContainerOptions, DestroyOptions, Size } from 'pixi.js'
+import { Container, DestroyOptions, Size, assignWithIgnore } from 'pixi.js'
 import { Yoga, YogaConfig } from './init.ts'
 import {
   Align,
@@ -13,6 +13,7 @@ import {
   Display
 } from 'yoga-layout/load'
 import { FLEX_AFTER_LAYOUT, FormattedValue, FormattedValueWithAuto, formatValue } from './utils.ts'
+import { FlexContainerOptions, splitConstructorOptions } from './constructor.ts'
 
 export class FlexContainer extends Container {
 
@@ -50,14 +51,21 @@ export class FlexContainer extends Container {
     }
   }
 
-  constructor(options?: ContainerOptions) {
-    super(options)
+  constructor(options?: FlexContainerOptions) {
+    // pixi v8 支持在 options 中传入属性进行初始化。@pixi/react 中就会如此使用
+    // 但初始化操作默认放在 super 中进行，此时本类中的 yoga node 还未初始化，导致调用 setter 报错
+    // 因此我们需拆分出属于本类的属性，在子类对象初始化完后再进行赋值
+    const { containerOptions, flexOptions, children } = splitConstructorOptions(options)
+    super(containerOptions)
     this.onAddedOrRemoved = this.onAddedOrRemoved.bind(this)
     this.onChildrenChange = this.onChildrenChange.bind(this)
     this.onChildAdded = this.onChildAdded.bind(this)
     this.onChildRemoved = this.onChildRemoved.bind(this)
     this.onRenderRoot = this.onRenderRoot.bind(this)
     this.initListeners()
+    assignWithIgnore(this, flexOptions)
+    // children 也要拆分出来在最后 add，以确保 listeners 触发
+    children?.forEach(child => this.addChild(child))
   }
 
   // there are many methods that change the parent-child relation
