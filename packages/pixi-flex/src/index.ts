@@ -17,4 +17,6 @@ export { initPixiFlexLayout } from './init.ts'
 
 export { FLEX_AFTER_LAYOUT } from './utils.ts'
 
+export type { FlexContainerOptions } from './constructor.ts'
+
 export * from './FlexContainer'

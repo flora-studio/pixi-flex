@@ -1,6 +1,6 @@
 import type { ContainerOptions, ContainerChild } from 'pixi.js'
 import type { FormattedValue, FormattedValueWithAuto } from './utils.ts'
-import type { Align, Direction, FlexDirection, Wrap, Justify, Overflow, PositionType } from 'yoga-layout'
+import type { Align, Direction, FlexDirection, Wrap, Justify, Overflow, PositionType } from 'yoga-layout/load'
 
 export interface FlexContainerOptions extends ContainerOptions {
   flexWidth?: FormattedValueWithAuto
