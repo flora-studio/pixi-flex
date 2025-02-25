@@ -20,7 +20,8 @@ const PixiRoot = forwardRef<Container, Props>(function PixiRoot({ init }: Props,
   useEffect(() => {
     initCallback().then(root => setRootNode(root))
     return () => {
-      document.getElementById('pixi-root')!.innerHTML = ''
+      const domRoot = document.getElementById('pixi-root')
+      if (domRoot) domRoot.innerHTML = ''
     }
   }, [initCallback])
 
