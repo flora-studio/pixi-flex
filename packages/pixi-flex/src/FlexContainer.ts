@@ -1,4 +1,4 @@
-import { Container, DestroyOptions, Size, assignWithIgnore } from 'pixi.js'
+import { Container, DestroyOptions, Size, assignWithIgnore, ContainerChild } from 'pixi.js'
 import { Yoga, YogaConfig } from './init.ts'
 import {
   Align,
@@ -16,7 +16,7 @@ import { FLEX_AFTER_LAYOUT, FormattedValue, FormattedValueWithAuto, formatValue 
 import { FlexContainerOptions, splitConstructorOptions } from './constructor.ts'
 import { createArrayProxy } from './arrayProxy.ts'
 
-export class FlexContainer extends Container {
+export class FlexContainer<C extends ContainerChild = ContainerChild> extends Container<C> {
 
   protected readonly node = Yoga!.Node.create(YogaConfig)
 
@@ -41,7 +41,7 @@ export class FlexContainer extends Container {
   }
 
   // children 真正改变前调用
-  private onChildAdded(index: number, child: Container) {
+  private onChildAdded(index: number, child: C) {
     // console.log({ type: 'insert', index, label: child.label })
     checkMixedChildren(this.children, child)
     if (child instanceof FlexContainer) {
@@ -50,14 +50,14 @@ export class FlexContainer extends Container {
   }
 
   // children 真正改变前调用
-  private onChildRemoved(_index: number, child: Container) {
+  private onChildRemoved(_index: number, child: C) {
     // console.log({ type: 'delete', index: _index, label: child.label })
     if (child instanceof FlexContainer) {
       this.node.removeChild(child.node)
     }
   }
 
-  constructor(options?: FlexContainerOptions) {
+  constructor(options?: FlexContainerOptions<C>) {
     // pixi v8 支持在 options 中传入属性进行初始化。@pixi/react 中就会如此使用
     // 但初始化操作默认放在 super 中进行，此时本类中的 yoga node 还未初始化，导致调用 setter 报错
     // 因此我们需拆分出属于本类的属性，在子类对象初始化完后再进行赋值
@@ -102,7 +102,7 @@ export class FlexContainer extends Container {
   // 如果使用 proxy 拦截 set 事件，一方面会有 push 等操作触发多次的问题
   // 另一方面，过程中会出现同一个 child 被 add 到两个不同下标的情况，而这在 yoga 中是不被允许的（报错 Child already has a owner, it must be removed first.）
   // 因此这种情况我们手动处理下
-  override swapChildren(child1: Container, child2: Container) {
+  override swapChildren<U extends C>(child1: U, child2: U) {
     super.swapChildren(child2, child2)
     if (child1 === child2) return
     if (!(child1 instanceof FlexContainer) || !(child2 instanceof FlexContainer)) return
@@ -161,7 +161,7 @@ export class FlexContainer extends Container {
   protected onMeasureLeaf() {
     if (!this.isFlexLeaf) {
       for (const child of this.children) {
-        (child as FlexContainer).onMeasureLeaf?.()
+        (child as unknown as FlexContainer).onMeasureLeaf?.()
       }
       return
     }
@@ -197,7 +197,7 @@ export class FlexContainer extends Container {
     // layout children
     if (!this.isFlexLeaf) {
       for (const child of this.children) {
-        (child as FlexContainer).applyLayout?.()
+        (child as unknown as FlexContainer).applyLayout?.()
       }
     } else {
       // provide width & height info to children
@@ -242,7 +242,7 @@ export class FlexContainer extends Container {
   // exposed to outside for manually calling layout
   doLayout() {
     if (!this.isFlexRoot) {
-      (this.parent as FlexContainer).doLayout()
+      (this.parent as FlexContainer<FlexContainer>).doLayout()
       return
     }
     this.onRenderRoot()

@@ -2,7 +2,7 @@ import type { ContainerOptions, ContainerChild } from 'pixi.js'
 import type { FormattedValue, FormattedValueWithAuto } from './utils.ts'
 import type { Align, Direction, FlexDirection, Wrap, Justify, Overflow, PositionType } from 'yoga-layout/load'
 
-export interface FlexContainerOptions extends ContainerOptions {
+export interface FlexContainerOptions<C extends ContainerChild> extends ContainerOptions<C> {
   flexWidth?: FormattedValueWithAuto
   flexHeight?: FormattedValueWithAuto
   visible?: boolean
@@ -62,7 +62,7 @@ export interface FlexContainerOptions extends ContainerOptions {
   positionType?: PositionType
 }
 
-const FlexContainerSpecificKeys = Object.freeze<(keyof FlexContainerOptions)[]>([
+const FlexContainerSpecificKeys = Object.freeze<(keyof FlexContainerOptions<ContainerChild>)[]>([
   'flexWidth',
   'flexHeight',
   'visible',
@@ -122,12 +122,12 @@ const FlexContainerSpecificKeys = Object.freeze<(keyof FlexContainerOptions)[]>(
   'positionType'
 ])
 
-export function splitConstructorOptions(options: FlexContainerOptions = {}) {
-  const containerOptions: ContainerOptions = {}
-  const flexOptions: FlexContainerOptions = {}
-  let children: ContainerChild[] | undefined = undefined
+export function splitConstructorOptions<C extends ContainerChild>(options: FlexContainerOptions<C> = {}) {
+  const containerOptions: ContainerOptions<C> = {}
+  const flexOptions: FlexContainerOptions<C> = {}
+  let children: C[] | undefined = undefined
   for (const key in options) {
-    const typedKey = key as keyof FlexContainerOptions
+    const typedKey = key as keyof FlexContainerOptions<C>
     if (typedKey === 'children') {
       children = options[typedKey]
     } else if (FlexContainerSpecificKeys.includes(typedKey)) {
