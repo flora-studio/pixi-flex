@@ -14,6 +14,7 @@ import {
 } from 'yoga-layout/load'
 import { FLEX_AFTER_LAYOUT, FormattedValue, FormattedValueWithAuto, formatValue } from './utils.ts'
 import { FlexContainerOptions, splitConstructorOptions } from './constructor.ts'
+import { createArrayProxy } from './arrayProxy.ts'
 
 export class FlexContainer extends Container {
 
@@ -34,18 +35,23 @@ export class FlexContainer extends Container {
     this.isFlexRoot = !(this.parent instanceof FlexContainer)
   }
 
+  // children 真正改变后调用
   private onChildrenChange() {
     this.isFlexLeaf = this.children.every(child => !(child instanceof FlexContainer))
   }
 
-  private onChildAdded(child: Container, _: Container, index: number) {
-    checkMixedChildren(this.children, child, index)
+  // children 真正改变前调用
+  private onChildAdded(index: number, child: Container) {
+    // console.log({ type: 'insert', index, label: child.label })
+    checkMixedChildren(this.children, child)
     if (child instanceof FlexContainer) {
       this.node.insertChild(child.node, index)
     }
   }
 
-  private onChildRemoved(child: Container) {
+  // children 真正改变前调用
+  private onChildRemoved(_index: number, child: Container) {
+    // console.log({ type: 'delete', index: _index, label: child.label })
     if (child instanceof FlexContainer) {
       this.node.removeChild(child.node)
     }
@@ -63,6 +69,16 @@ export class FlexContainer extends Container {
     this.onChildRemoved = this.onChildRemoved.bind(this)
     this.onRenderRoot = this.onRenderRoot.bind(this)
     this.initListeners()
+    // 使用 proxy 监听 children 的变化
+    // 虽然 pixijs 提供了 `childAdded` 和 `childRemoved` 事件，但并不是所有的 children 改动都会触发
+    // 例如通过 `addChild` 在同一个 parent 下改变 child 的顺序时就不会触发
+    // @see https://github.com/pixijs/pixijs/blob/v8.8.0/src/scene/container/Container.ts#L671
+    // 因此我们通过 proxy 的方式拦截对 `this.children` 的操作，并同步到 yoga tree
+    this.children = createArrayProxy(this.children, {
+      onInsert: this.onChildAdded,
+      onDelete: this.onChildRemoved,
+      onChanged: this.onChildrenChange,
+    })
     assignWithIgnore(this, flexOptions)
     // children 也要拆分出来在最后 add，以确保 listeners 触发
     children?.forEach(child => this.addChild(child))
@@ -73,24 +89,19 @@ export class FlexContainer extends Container {
   private initListeners() {
     this.on('added', this.onAddedOrRemoved)
     this.on('removed', this.onAddedOrRemoved)
-    this.on('childAdded', this.onChildrenChange)
-    this.on('childRemoved', this.onChildrenChange)
-    this.on('childAdded', this.onChildAdded)
-    this.on('childRemoved', this.onChildRemoved)
     this.onRender = this.onRenderRoot
   }
 
   private removeListeners() {
     this.off('added', this.onAddedOrRemoved)
     this.off('removed', this.onAddedOrRemoved)
-    this.off('childAdded', this.onChildrenChange)
-    this.off('childRemoved', this.onChildrenChange)
-    this.off('childAdded', this.onChildAdded)
-    this.off('childRemoved', this.onChildRemoved)
   }
 
-  // it seems the only exception is `swapChildren`
-  // which mutates `children` without event emitted
+  // swapChildren 使用下标操作 this.children
+  // @see https://github.com/pixijs/pixijs/blob/v8.8.0/src/scene/container/container-mixins/childrenHelperMixin.ts#L233
+  // 如果使用 proxy 拦截 set 事件，一方面会有 push 等操作触发多次的问题
+  // 另一方面，过程中会出现同一个 child 被 add 到两个不同下标的情况，而这在 yoga 中是不被允许的（报错 Child already has a owner, it must be removed first.）
+  // 因此这种情况我们手动处理下
   override swapChildren(child1: Container, child2: Container) {
     super.swapChildren(child2, child2)
     if (child1 === child2) return
@@ -101,6 +112,20 @@ export class FlexContainer extends Container {
     this.node.removeChild(child2.node)
     this.node.insertChild(child1.node, index2 - 1)
     this.node.insertChild(child2.node, index1)
+  }
+
+  // removeChildren 使用下标操作 this.children
+  // @see https://github.com/pixijs/pixijs/blob/v8.8.0/src/scene/container/container-mixins/childrenHelperMixin.ts#L53
+  // 我们手动处理下 yoga 的 remove node
+  override removeChildren(beginIndex?: number, endIndex?: number) {
+    const removed = super.removeChildren(beginIndex, endIndex)
+    for (const child of removed) {
+      if (child instanceof FlexContainer) {
+        child.node.removeChild(child.node)
+      }
+    }
+    this.onChildrenChange()
+    return removed
   }
 
   override destroy(options?: DestroyOptions) {
@@ -669,9 +694,9 @@ function isSizeDetermined(value: FormattedValueWithAuto) {
   return typeof value !== 'undefined' && value !== 'auto'
 }
 
-function checkMixedChildren(children: Container[], newChild: Container, newChildIndex: number) {
-  if (children.length <= 1) return // newChild is the only child
-  const whateverAnotherChild = children[newChildIndex === 0 ? 1 : 0]
+function checkMixedChildren(oldChildren: Container[], newChild: Container) {
+  if (oldChildren.length === 0) return // newChild is the only child
+  const whateverAnotherChild = oldChildren[0]
   const isAllFlexChildren = whateverAnotherChild instanceof FlexContainer
   const isNewFlexChildren = newChild instanceof FlexContainer
   if (isAllFlexChildren !== isNewFlexChildren) {
