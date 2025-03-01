@@ -4,7 +4,6 @@ PixiJS flex layout lib, powered by [Yoga](https://www.yogalayout.dev/)
 
 - [x] work with pixijs v8
 - [x] work with @pixi/react v8
-- [ ] animation
 
 ## Installation
 
@@ -85,4 +84,33 @@ function Main() {
     </flexContainer>
   )
 }
+```
+
+## Tips
+
+### Difference between `undefined` and `auto` in `flexWidth`/`flexHeight`
+If a `FlexContainer` is not a leaf node, they are the same.
+
+If it's a leaf node, then the default behavior (`undefined`) is, it will measure itself real width/height and set to Yoga node. This is the most common use case.
+
+However, sometimes you will need Yoga to decide the leaf node's size, and then set to the pixi component. In this case you can set `flexWidth`/`flexHeight` to `auto` to tell the `FlexContainer` do not measure, but let Yoga calculate.
+
+For example:
+```javascript
+// let a sprite to match parent
+const container = new FlexContainer({
+  positionType: PositionType.Absolute,
+  top: 0,
+  right: 0,
+  bottom: 0,
+  left: 0,
+  flexWidth: 'auto',
+  flexHeight: 'auto'
+})
+
+const sprite = new Sprite()
+container.on(FLEX_AFTER_LAYOUT, ({ width, height }) => {
+  sprite.width = width
+  sprite.height = height
+})
 ```
