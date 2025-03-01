@@ -691,7 +691,8 @@ export class FlexContainer<C extends ContainerChild = ContainerChild> extends Co
 }
 
 function isSizeDetermined(value: FormattedValueWithAuto) {
-  return typeof value !== 'undefined' && value !== 'auto'
+  // auto 和百分比也都不要去测量，因为这种情况下代表这个 node 需要根据其他的约束算出宽高，再把宽高设给内部的 pixi 对象
+  return typeof value !== 'undefined'
 }
 
 function checkMixedChildren(oldChildren: Container[], newChild: Container) {
