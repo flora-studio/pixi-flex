@@ -1,5 +1,11 @@
 # @florastudio/pixi-flex
 
+## DEPRECATED
+
+Since the official [@pixi/layout](https://github.com/pixijs/layout) package v3 has already refactored in Yoga, we recommend using the official package instead.
+
+---
+
 PixiJS flex layout lib, powered by [Yoga](https://www.yogalayout.dev/)
 
 - [x] work with pixijs v8
